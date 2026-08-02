@@ -1,0 +1,36 @@
+:root {
+  --bg: #f2f0ea;
+  --fg: #171512;
+  --border: #e4e0d7;
+  --muted: #8a857c;
+  --muted-2: #a9a294;
+  --muted-3: #b7b0a2;
+  --row-value: #2c2a24;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-archivo), Archivo, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--fg);
+  text-decoration: none;
+}
+
+a:hover {
+  opacity: 0.55;
+}
