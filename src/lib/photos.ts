@@ -2,24 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import sharp from "sharp";
 import { photoOverrides } from "./photo-captions";
-
-export type Photo = {
-  slug: string;
-  src: string;
-  width: number;
-  height: number;
-  blurDataURL: string;
-  alt: string;
-  caption: string;
-  film: string;
-  camera: string;
-  settings: string;
-  location: string;
-  year: string;
-  category: string;
-};
-
-export type PhotoRow = { k: string; v: string };
+import type { Photo } from "./photo-types";
 
 const PHOTOS_DIR = path.join(process.cwd(), "public", "photos");
 const EXTENSIONS = new Set([".jpg", ".jpeg", ".png", ".webp"]);
@@ -72,16 +55,4 @@ export async function loadPhotos(): Promise<Photo[]> {
       };
     }),
   );
-}
-
-export function rowsFor(p: Photo): PhotoRow[] {
-  const defs: [string, string][] = [
-    ["Filme", p.film],
-    ["Câmera", p.camera],
-    ["Config.", p.settings],
-    ["Local", p.location],
-    ["Ano", p.year],
-    ["Categoria", p.category],
-  ];
-  return defs.filter(([, v]) => v).map(([k, v]) => ({ k, v }));
 }

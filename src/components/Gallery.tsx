@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
-import { rowsFor, type Photo } from "@/lib/photos";
+import { rowsFor, type Photo } from "@/lib/photo-types";
 import styles from "./Gallery.module.css";
 
 const NAME = "Eric Pinheiro";
