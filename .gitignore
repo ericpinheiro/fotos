@@ -17,8 +17,6 @@
 /.next/
 /out/
 
-# photos: kept local / on the deploy server only, never in git
-/public/photos/
 
 # production
 /build

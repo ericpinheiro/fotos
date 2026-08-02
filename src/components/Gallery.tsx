@@ -57,7 +57,10 @@ export default function Gallery({ photos }: { photos: Photo[] }) {
       <div className={styles.colMeta}>
         <div className={styles.metaTopDesktop}>
           <div>{NAME}</div>
-          <div className={styles.metaTopDesktopSub}>analógico &amp; digital</div>
+          <div className={styles.metaTopDesktopSub}>
+            fotos analógicas
+            {/* &amp; digital */}
+          </div>
         </div>
         <div className={styles.metaBottom}>
           <div className={styles.metaCard} key={photo.slug}>

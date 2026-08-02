@@ -17,8 +17,8 @@ const spaceMono = Space_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Eric Pinheiro — Fotografia",
-  description: "Portfólio de fotografia analógica & digital de Eric Pinheiro.",
+  title: "Eric Pinheiro",
+  description: "Portfólio de fotografia analógica de Eric Pinheiro.",
 };
 
 export default function RootLayout({

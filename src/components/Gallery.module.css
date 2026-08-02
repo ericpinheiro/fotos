@@ -163,7 +163,7 @@
 
 .thmbActive {
   border-color: var(--fg);
-  border-color: #ff6400;
+  border-color: #fff;
 }
 
 .thmb img {

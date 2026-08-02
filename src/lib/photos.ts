@@ -29,20 +29,27 @@ export async function loadPhotos(): Promise<Photo[]> {
   return Promise.all(
     files.map(async (file) => {
       const slug = path.basename(file, path.extname(file));
+      const overrideKey = slug.replace(/^\d+[-_]/, "");
       const filePath = path.join(PHOTOS_DIR, file);
       const image = sharp(filePath).rotate();
-      const [{ width, height }, blurBuffer] = await Promise.all([
+      const [meta, blurBuffer] = await Promise.all([
         image.clone().metadata(),
         image.clone().resize(16).webp({ quality: 40 }).toBuffer(),
       ]);
-      const override = photoOverrides[slug] ?? {};
+      // sharp's .rotate() fixes the pixels for EXIF orientations 5-8 (90°/270°
+      // rotations) but .metadata() still reports the pre-rotation dimensions,
+      // so the width/height need to be swapped by hand here.
+      const swapped = (meta.orientation ?? 1) >= 5;
+      const width = (swapped ? meta.height : meta.width) ?? 1;
+      const height = (swapped ? meta.width : meta.height) ?? 1;
+      const override = photoOverrides[overrideKey] ?? {};
       const fallbackCaption = humanize(file);
 
       return {
         slug,
         src: `/photos/${file}`,
-        width: width ?? 1,
-        height: height ?? 1,
+        width,
+        height,
         blurDataURL: `data:image/webp;base64,${blurBuffer.toString("base64")}`,
         alt: override.alt ?? override.caption ?? fallbackCaption,
         caption: override.caption ?? fallbackCaption,
