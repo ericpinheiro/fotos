@@ -28,6 +28,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" className={`${archivo.variable} ${spaceMono.variable}`}>
+      <head>
+        <script
+          defer
+          src="https://umami.ericpinheiro.com/script.js"
+          data-website-id="0dd639e3-014c-4230-aef7-33c163d286ce"
+        ></script>
+      </head>
       <body>{children}</body>
     </html>
   );
