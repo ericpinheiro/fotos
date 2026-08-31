@@ -364,6 +364,12 @@ export const photoOverrides: Record<string, PhotoOverride> = {
     film: "Kodak Double-X 5222",
     settings: "ISO 250",
   },
+  "raio-de-luz": {
+    caption: "Venustidade",
+    alt: "Silhueta sob um feixe de luz numa cachoeira",
+    film: "Kodak Double-X 5222",
+    settings: "ISO 250",
+  },
   gruta: {
     caption: "Gruta",
     alt: "Mulher sentada em banco sob a gruta",
