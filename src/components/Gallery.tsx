@@ -15,13 +15,54 @@ export default function Gallery({ photos }: { photos: Photo[] }) {
   const [idx, setIdx] = useState(0);
   const count = photos.length;
 
+  // replaceState (not location.hash) so navigating doesn't fill the browser
+  // history, fire hashchange or scroll. history.state is kept for Next's router.
+  const show = useCallback(
+    (i: number) => {
+      setIdx(i);
+      window.history.replaceState(
+        window.history.state,
+        "",
+        `#${encodeURIComponent(photos[i].id)}`,
+      );
+    },
+    [photos],
+  );
+
   const goPrev = useCallback(() => {
-    setIdx((i) => (i - 1 + count) % count);
-  }, [count]);
+    show((idx - 1 + count) % count);
+  }, [idx, count, show]);
 
   const goNext = useCallback(() => {
-    setIdx((i) => (i + 1) % count);
-  }, [count]);
+    show((idx + 1) % count);
+  }, [idx, count, show]);
+
+  // The server can't see the fragment, so the photo from a shared link
+  // (/#roda-gigante) is only picked after mount.
+  useEffect(() => {
+    const syncFromHash = () => {
+      const raw = window.location.hash.slice(1);
+      if (!raw) return;
+      let id = raw;
+      try {
+        id = decodeURIComponent(raw);
+      } catch {}
+      const i = photos.findIndex((p) => p.id === id);
+      if (i >= 0) {
+        setIdx(i);
+      } else {
+        setIdx(0);
+        window.history.replaceState(
+          window.history.state,
+          "",
+          window.location.pathname + window.location.search,
+        );
+      }
+    };
+    syncFromHash();
+    window.addEventListener("hashchange", syncFromHash);
+    return () => window.removeEventListener("hashchange", syncFromHash);
+  }, [photos]);
 
   useEffect(() => {
     if (count === 0) return;
@@ -121,7 +162,7 @@ export default function Gallery({ photos }: { photos: Photo[] }) {
           <button
             type="button"
             key={t.slug}
-            onClick={() => setIdx(i)}
+            onClick={() => show(i)}
             className={`${styles.thmb} ${i === idx ? styles.thmbActive : ""}`}
             aria-label={`Ver foto: ${t.caption || t.alt}`}
             aria-current={i === idx}

@@ -26,7 +26,7 @@ export async function loadPhotos(): Promise<Photo[]> {
     .filter((f) => EXTENSIONS.has(path.extname(f).toLowerCase()))
     .sort((a, b) => a.localeCompare(b, "pt-BR"));
 
-  return Promise.all(
+  const photos = await Promise.all(
     files.map(async (file) => {
       const slug = path.basename(file, path.extname(file));
       const overrideKey = slug.replace(/^\d+[-_]/, "");
@@ -47,6 +47,7 @@ export async function loadPhotos(): Promise<Photo[]> {
 
       return {
         slug,
+        id: overrideKey,
         src: `/photos/${file}`,
         width,
         height,
@@ -62,4 +63,14 @@ export async function loadPhotos(): Promise<Photo[]> {
       };
     }),
   );
+
+  const seen = new Set<string>();
+  for (const p of photos) {
+    if (seen.has(p.id)) {
+      console.warn(`[photos] id duplicado "${p.id}": links /#${p.id} abrem só a primeira`);
+    }
+    seen.add(p.id);
+  }
+
+  return photos;
 }

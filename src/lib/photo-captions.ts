@@ -12,6 +12,8 @@ export type PhotoOverride = {
 /**
  * Chave = nome do arquivo em public/photos, sem extensão e sem o prefixo
  * numérico de ordenação (ex: "roda-gigante" para "003-roda-gigante.jpg").
+ * Esse mesmo nome é o id público da foto nos links (ex: "/#roda-gigante"),
+ * então renomear o arquivo quebra links já compartilhados.
  * Fotos sem entrada aqui usam o nome do arquivo como legenda. Os demais
  * campos são opcionais e só aparecem no site quando preenchidos.
  */

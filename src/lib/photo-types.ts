@@ -1,5 +1,6 @@
 export type Photo = {
   slug: string;
+  id: string;
   src: string;
   width: number;
   height: number;
