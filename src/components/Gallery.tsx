@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { rowsFor, type Photo } from "@/lib/photo-types";
 import styles from "./Gallery.module.css";
@@ -11,9 +11,46 @@ function pad(n: number) {
   return String(n).padStart(2, "0");
 }
 
+type RailScroll = "center" | "nearest";
+
+// Scrolls only the rail (never scrollIntoView, which would also scroll the
+// page on mobile). Works on both axes, so it covers the vertical desktop rail
+// and the horizontal mobile one without checking the breakpoint.
+function scrollRailTo(rail: HTMLElement, thumb: HTMLElement, mode: RailScroll) {
+  const r = rail.getBoundingClientRect();
+  const t = thumb.getBoundingClientRect();
+
+  const delta = (
+    rStart: number,
+    rSize: number,
+    tStart: number,
+    tSize: number,
+  ) => {
+    const offset = tStart - rStart;
+    if (mode === "center") return offset - (rSize - tSize) / 2;
+    if (offset < 0) return offset;
+    if (offset + tSize > rSize) return offset + tSize - rSize;
+    return 0;
+  };
+
+  const top = delta(r.top, r.height, t.top, t.height);
+  const left = delta(r.left, r.width, t.left, t.width);
+  if (top === 0 && left === 0) return;
+
+  const reduceMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)",
+  ).matches;
+  rail.scrollBy({
+    top,
+    left,
+    behavior: mode === "center" || reduceMotion ? "auto" : "smooth",
+  });
+}
+
 export default function Gallery({ photos }: { photos: Photo[] }) {
   const [idx, setIdx] = useState(0);
   const count = photos.length;
+  const railRef = useRef<HTMLDivElement>(null);
 
   // replaceState (not location.hash) so navigating doesn't fill the browser
   // history, fire hashchange or scroll. history.state is kept for Next's router.
@@ -50,6 +87,13 @@ export default function Gallery({ photos }: { photos: Photo[] }) {
       const i = photos.findIndex((p) => p.id === id);
       if (i >= 0) {
         setIdx(i);
+        // Every thumbnail is already rendered, so the rail can be centered on
+        // the shared photo right away, before the re-render.
+        const rail = railRef.current;
+        const thumb = rail?.children[i];
+        if (rail && thumb instanceof HTMLElement) {
+          scrollRailTo(rail, thumb, "center");
+        }
       } else {
         setIdx(0);
         window.history.replaceState(
@@ -63,6 +107,20 @@ export default function Gallery({ photos }: { photos: Photo[] }) {
     window.addEventListener("hashchange", syncFromHash);
     return () => window.removeEventListener("hashchange", syncFromHash);
   }, [photos]);
+
+  // Regular navigation only scrolls the rail when the active thumbnail is out
+  // of view. Skipped on mount, otherwise it would pull the rail back to the
+  // first thumbnail right after a shared link centered it.
+  const railIdx = useRef(idx);
+  useEffect(() => {
+    if (railIdx.current === idx) return;
+    railIdx.current = idx;
+    const rail = railRef.current;
+    const thumb = rail?.children[idx];
+    if (rail && thumb instanceof HTMLElement) {
+      scrollRailTo(rail, thumb, "nearest");
+    }
+  }, [idx]);
 
   useEffect(() => {
     if (count === 0) return;
@@ -157,7 +215,7 @@ export default function Gallery({ photos }: { photos: Photo[] }) {
         </div>
       </div>
 
-      <div className={styles.colRail}>
+      <div className={styles.colRail} ref={railRef}>
         {photos.map((t, i) => (
           <button
             type="button"

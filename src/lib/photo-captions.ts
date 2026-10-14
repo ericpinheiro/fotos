@@ -342,7 +342,7 @@ export const photoOverrides: Record<string, PhotoOverride> = {
     film: "Kodak Double-X 5222",
     settings: "ISO 250",
   },
-  "gado-na-estrada": {
+  "gado-fotogenico": {
     caption: "Gado na fotogenico",
     alt: "Gado pastando à beira de uma estrada de terra na serra",
     film: "Kodak Double-X 5222",
